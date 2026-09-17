@@ -1,40 +1,33 @@
-# Ứng dụng Xử lý Ảnh: Phát hiện và Đếm phát hiện công nhân mặc đồ bảo hộ lao động tại công trường xây dựng.
+# Ứng dụng Xử lý Ảnh: Phát hiện và Đếm số lượng công nhân mặc/không mặc đồ bảo hộ lao động
 
-Đồ án môn học **Xử lý ảnh** sử dụng các phương pháp xử lý ảnh truyền thống bằng OpenCV (Python) kết hợp giao diện trực quan với Streamlit để phát hiện, phân đoạn và đếm số lượng công nhân/thiết bị mặc áo/mũ phản quang trên công trường.
+Đồ án môn học **Xử lý ảnh** ứng dụng mô hình Hybrid kết hợp **Xử lý ảnh truyền thống bằng OpenCV (Python)** với **Deep Learning (YOLOv8)** để phát hiện, định vị và đếm số lượng công nhân có hoặc không mặc đồ bảo hộ lao động (mũ, áo phản quang) tại công trường xây dựng, tích hợp giao diện web trực quan.
 
 ---
 
 ## Các tính năng chính
-* **Tiền xử lý ảnh (Preprocessing):** Chuyển đổi không gian màu (BGR sang HSV/LAB) để tăng độ thích ứng với ánh sáng phức tạp và áp dụng bộ lọc khử nhiễu (Gaussian Blur).
-* **Phân đoạn màu sắc (Color Thresholding):** Tách biệt vùng màu đặc trưng của áo/mũ phản quang dựa trên dải màu HSV (`cv2.inRange`).
-* **Xử lý hình thái học (Morphological Operations):** Sử dụng các phép toán Erosion, Dilation, Opening và Closing để loại bỏ nhiễu và làm sạch đối tượng.
-* **Nhận diện đường viền (Contour Detection):** Tìm kiếm và lọc các đối tượng dựa trên diện tích (Area) và tỷ lệ khung hình (Aspect Ratio).
-* **Giao diện Web trực quan (Streamlit UI):** Cho phép người dùng tải ảnh lên, xem kết quả trực quan và theo dõi thống kê số lượng đối tượng phát hiện.
-## cấu trúc thư mục dự án
+* **Tiền xử lý ảnh (Preprocessing):** 
+  * Khử nhiễu hạt bằng bộ lọc **Gaussian Blur**.
+  * Chuyển đổi không gian màu sang **LAB** kết hợp thuật toán **CLAHE (Contrast Limited Adaptive Histogram Equalization)** để tối ưu hóa độ tương phản và chi tiết vùng áo phản quang, mũ bảo hộ dưới điều kiện ánh sáng phức tạp.
+* **Huấn luyện mô hình AI (YOLOv8 Object Detection):** Huấn luyện mô hình Deep Learning trên tập dữ liệu chuẩn hóa để nhận diện chính xác 2 nhóm đối tượng: công nhân có mặc đồ bảo hộ và không mặc đồ bảo hộ.
+* **Pipeline kết hợp (Hybrid Approach):** Tận dụng xử lý ảnh truyền thống ở khâu tiền hóa dữ liệu đầu vào kết hợp cùng YOLOv8 ở tầng suy luận (Inference) giúp nâng cao độ chính xác.
+* **Giao diện Web trực quan (Streamlit / FastAPI UI):** Cho phép người dùng tải ảnh lên, xem trực quan các bounding box kết quả và thống kê số lượng đối tượng được phát hiện.
+
+---
+
+## Cấu trúc thư mục dự án
 ```text
-Construction_Image_Processing/
+worker-safety-detection/
 │
-├── data/                    # Thư mục chứa ảnh test đầu vào
-│   ├── raw/                 # Ảnh gốc thu thập
-│   └── processed/           # Ảnh sau khi qua các bước xử lý
+├── data/                    # Thư mục chứa dữ liệu
+│   ├── raw_img/             # Ảnh gốc thu thập (hoặc raw_dataset từ Roboflow)
+│   ├── processed_img/       # Ảnh sau khi qua pipeline tiền xử lý (CLAHE + Blur)
+│   └── data.yaml            # File cấu hình tập dữ liệu cho YOLO
 │
 ├── src/                     # Mã nguồn chính của dự án
-│   ├── preprocessing.py     # Module xử lý màu và lọc nhiễu
-│   ├── segmentation.py      # Module tách màu và hình thái học
-│   ├── detection.py         # Module tìm contours và vẽ bounding box
-│   └── app.py               # File giao diện ứng dụng Streamlit
+│   ├── Preprocessing/       # Module tiền xử lý (preprocessing.py)
+│   ├── detection/           # Module huấn luyện và inference mô hình YOLO (train.py)
+│   ├── segmentation/        # Module phân đoạn hỗ trợ (nếu có)
+│   └── UI/                  # File giao diện ứng dụng web
 │
 ├── requirements.txt         # Danh sách các thư viện Python cần thiết
 └── README.md                # Tài liệu hướng dẫn sử dụng dự án
-```
-## Công Nghệ & Thư Viện Sử Dụng
-Python (Phiên bản 3.9 trở lên)
-OpenCV (cv2): Thư viện xử lý ảnh cốt lõi.
-NumPy: Thao tác và xử lý mảng ma trận pixel.
-Streamlit: Xây dựng giao diện web demo trực quan.
-## Hướng Dẫn Cài Đặt & Chạy Ứng Dụng
-1. Clone repository về máy
-2. Cài đặt các thư viện phụ thuộc
-Đảm bảo bạn đã cài đặt Python, sau đó chạy lệnh sau để cài đặt các thư viện trong file requirements.txt:
-
-pip install -r requirements.txt
