@@ -14,5 +14,4 @@ ENV/
 Thumbs.db
 
 # Ảnh kết quả test sinh ra trong quá trình chạy (nếu có lưu tự động)
-data/processed_img/*.jpg
-data/processed_img/*.png
+data/raw_dataset
