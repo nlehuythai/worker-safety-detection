@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Site Safety Detection System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .upload-section {
+            border: 2px dashed #3498db;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            background: #ebf5fb;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-section input[type="file"] {
+            display: none;
+        }
+
+        .btn-submit {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #27ae60;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #e67e22;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .image-card {
+            text-align: center;
+        }
+
+        .image-card img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>👷‍♂️ Worker Safety Detection System</h1>
+        <p style="text-align: center; color: #666;">Upload construction site images for AI analysis and safety violation
+            detection</p>
+
+        <form id="uploadForm">
+            <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+                <p id="fileNameDisplay">📁 Click here to select an image (.jpg, .png)</p>
+                <input type="file" id="fileInput" name="image" accept="image/*" required onchange="showFileName(this)">
+            </div>
+            <button type="submit" class="btn-submit">🚀 Run Analysis</button>
+        </form>
+
+        <div class="loading" id="loadingText">⏳ Processing image via OpenCV & YOLOv8 algorithms... Please wait!</div>
+
+        <div class="result-container" id="resultContainer">
+            <h2>📊 Detection Results</h2>
+            <div class="image-grid">
+                <div class="image-card">
+                    <h3>📷 Original Image</h3>
+                    <img id="originalImg" src="" alt="Original Image">
+                </div>
+                <div class="image-card">
+                    <h3>🤖 Detected Violations</h3>
+                    <img id="annotatedImg" src="" alt="Annotated Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFileName(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('fileNameDisplay').innerText = "📄 Selected: " + input.files[0].name;
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            document.getElementById('loadingText').style.display = 'block';
+            document.getElementById('resultContainer').style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('originalImg').src = result.original_image;
+                    document.getElementById('annotatedImg').src = result.annotated_image;
+                    document.getElementById('resultContainer').style.display = 'block';
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to process image'));
+                }
+            } catch (error) {
+                alert('An error occurred while connecting to the Flask Server!');
+                console.error(error);
+            } finally {
+                document.getElementById('loadingText').style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
