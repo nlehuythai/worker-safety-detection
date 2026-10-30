@@ -1,0 +1,118 @@
+{
+    "image": "input_c0852c860347.jfif",
+    "timestamp": "2026-10-28 14:27:48",
+    "confidence_threshold": 0.1,
+    "total_violations": 10,
+    "violations": [
+        {
+            "class": "no-safety-vest",
+            "label": "No Safety Vest",
+            "confidence": 0.823,
+            "bbox": {
+                "x1": 624,
+                "y1": 121,
+                "x2": 747,
+                "y2": 296
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.381,
+            "bbox": {
+                "x1": 625,
+                "y1": 76,
+                "x2": 695,
+                "y2": 143
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.326,
+            "bbox": {
+                "x1": 610,
+                "y1": 41,
+                "x2": 669,
+                "y2": 86
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.325,
+            "bbox": {
+                "x1": 315,
+                "y1": 219,
+                "x2": 394,
+                "y2": 294
+            }
+        },
+        {
+            "class": "no-safety-vest",
+            "label": "No Safety Vest",
+            "confidence": 0.247,
+            "bbox": {
+                "x1": 585,
+                "y1": 380,
+                "x2": 716,
+                "y2": 522
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.193,
+            "bbox": {
+                "x1": 553,
+                "y1": 345,
+                "x2": 613,
+                "y2": 393
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.172,
+            "bbox": {
+                "x1": 323,
+                "y1": 223,
+                "x2": 387,
+                "y2": 277
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.17,
+            "bbox": {
+                "x1": 609,
+                "y1": 41,
+                "x2": 681,
+                "y2": 95
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.15,
+            "bbox": {
+                "x1": 618,
+                "y1": 59,
+                "x2": 689,
+                "y2": 121
+            }
+        },
+        {
+            "class": "no-helmet",
+            "label": "No Helmet",
+            "confidence": 0.134,
+            "bbox": {
+                "x1": 546,
+                "y1": 342,
+                "x2": 624,
+                "y2": 404
+            }
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "image": "input_317e18004803.jfif",
+    "timestamp": "2026-10-28 14:07:04",
+    "confidence_threshold": 0.5,
+    "total_violations": 1,
+    "violations": [
+        {
+            "class": "no-safety-vest",
+            "confidence": 0.823,
+            "bbox": {
+                "x1": 624,
+                "y1": 121,
+                "x2": 747,
+                "y2": 296
+            }
+        }
+    ]
+}

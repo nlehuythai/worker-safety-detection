@@ -1,0 +1,19 @@
+{
+    "image": "input_502d6f55bb47.jpg",
+    "timestamp": "2026-10-28 14:29:47",
+    "confidence_threshold": 0.1,
+    "total_violations": 1,
+    "violations": [
+        {
+            "class": "no-safety-glasses",
+            "label": "No Safety Glasses",
+            "confidence": 0.558,
+            "bbox": {
+                "x1": 301,
+                "y1": 120,
+                "x2": 375,
+                "y2": 164
+            }
+        }
+    ]
+}

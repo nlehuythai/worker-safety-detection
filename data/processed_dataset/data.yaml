@@ -1,20 +1,14 @@
-path: D:/worker-safety-detection/data/processed_dataset # Đường dẫn tuyệt đối đến thư mục chứa dataset của bạn
-train: train # Thư mục train nằm ngay trong path trên
-val: valid # (Hoặc val tùy thuộc vào tên thư mục kiểm thử thực tế của bạn là val hay valid)
+path: D:/XuLyAnh/worker-safety-detection/data/processed_dataset 
+train: train
+val: valid 
+test: test
 
-nc: 12
+nc: 5
 names:
   [
-    "construction-machine",
-    "fall_hazard",
-    "no-fall-protection",
     "no-helmet",
     "no-safety-glasses",
     "no-safety-vest",
     "phone-usage",
-    "poor-housekeeping",
-    "safe-ladder-usage",
-    "unsafe_ladder_use",
-    "unsecure- electricalwires",
     "using-mobile-beside-construction-machine",
   ]

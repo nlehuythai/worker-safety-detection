@@ -1,0 +1,41 @@
+{
+    "image": "input_66823edf9e6f.jpg",
+    "timestamp": "2026-10-28 14:17:51",
+    "confidence_threshold": 0.1,
+    "total_violations": 3,
+    "violations": [
+        {
+            "class": "no-safety-glasses",
+            "label": "No Safety Glasses",
+            "confidence": 0.561,
+            "bbox": {
+                "x1": 155,
+                "y1": 275,
+                "x2": 206,
+                "y2": 297
+            }
+        },
+        {
+            "class": "no-safety-glasses",
+            "label": "No Safety Glasses",
+            "confidence": 0.491,
+            "bbox": {
+                "x1": 338,
+                "y1": 324,
+                "x2": 390,
+                "y2": 346
+            }
+        },
+        {
+            "class": "no-safety-glasses",
+            "label": "No Safety Glasses",
+            "confidence": 0.119,
+            "bbox": {
+                "x1": 472,
+                "y1": 341,
+                "x2": 514,
+                "y2": 360
+            }
+        }
+    ]
+}

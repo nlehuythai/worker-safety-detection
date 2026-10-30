@@ -1,0 +1,10 @@
+=== BÁO CÁO VI PHẠM AN TOÀN LAO ĐỘNG ===
+Mã báo cáo  : REP_20260928_143748
+Thời gian   : 2026-09-28 14:37:48
+File ảnh    : 4bd1f9c5a57846dc870c0fdca0658809.jfif
+Tổng số lỗi : 12
+----------------------------------------
+CHI TIẾT LỖI:
+ - No Safety Vest: 3 trường hợp
+ - No Helmet: 9 trường hợp
+========================================

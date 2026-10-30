@@ -1,114 +1,338 @@
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    render_template
+)
+
 import os
-from werkzeug.utils import secure_filename
-import sys
-
-# Add Source_Code directory to Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-source_code_dir = os.path.join(current_dir, 'Source_Code')
-if source_code_dir not in sys.path:
-    sys.path.append(source_code_dir)
-
-from inference import SafetyViolationDetector
 import uuid
+
+
+from pipeline import SafetyViolationPipeline
+
 
 app = Flask(__name__)
 
-# Configure folders
-UPLOAD_FOLDER = os.path.join('uploads')
-STATIC_FOLDER = os.path.join('static')
-MODEL_FOLDER = os.path.join('Model Weights')
-TEMPLATES_FOLDER = os.path.join('templates')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg','jfif'}
 
-# Create necessary directories
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(STATIC_FOLDER, exist_ok=True)
+# =========================================================
+# CONFIG
+# =========================================================
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['STATIC_FOLDER'] = STATIC_FOLDER
-app.template_folder = TEMPLATES_FOLDER
+MODEL_PATH = os.path.join(
+    "Model Weights",
+    "best.pt"
+)
 
-# Initialize the detector with correct model path
-model_path = os.path.join(MODEL_FOLDER, 'best.pt')
-print(f"\nInitializing Safety Violation Detector")
-print(f"Model path: {model_path}")
-print(f"Model exists: {os.path.exists(model_path)}")
 
-try:
-    detector = SafetyViolationDetector(model_path)
-    print("Detector initialized successfully!")
-except Exception as e:
-    print(f"Error initializing detector: {e}")
-    raise
+# =========================================================
+# CHECK MODEL
+# =========================================================
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+if not os.path.exists(MODEL_PATH):
 
-def generate_unique_filename(original_filename):
-    """Generate a unique filename while preserving the original extension"""
-    ext = os.path.splitext(original_filename)[1]
-    return f"{uuid.uuid4().hex}{ext}"
+    raise FileNotFoundError(
+        f"Không tìm thấy model: {MODEL_PATH}"
+    )
 
-@app.route('/')
-def index():
-    """Serve the upload form"""
-    return render_template('index.html')
 
-@app.route('/analyze', methods=['POST'])
-def analyze_image():
-    """
-    Endpoint to analyze an image for safety violations.
-    Expects an image file in the request.
-    """
-    # Check if image was uploaded
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
-    
-    file = request.files['image']
-    
-    # Check if a file was selected
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-    
-    if file and allowed_file(file.filename):
+# =========================================================
+# PIPELINE
+# =========================================================
+
+pipeline = SafetyViolationPipeline(
+    MODEL_PATH
+)
+
+
+# =========================================================
+# HOME
+# =========================================================
+
+@app.route("/")
+def home():
+
+    return render_template(
+        "index.html"
+    )
+
+
+# =========================================================
+# ANALYZE
+# =========================================================
+
+@app.route(
+    "/analyze",
+    methods=["POST"]
+)
+def analyze():
+
+    try:
+
+        # -------------------------------------------------
+        # CHECK FILE
+        # -------------------------------------------------
+
+        if "file" not in request.files:
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    "Không tìm thấy file ảnh."
+
+            }), 400
+
+        file = request.files["file"]
+
+        if file.filename == "":
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    "Chưa chọn file ảnh."
+
+            }), 400
+
+        # -------------------------------------------------
+        # EXTENSION
+        # -------------------------------------------------
+
+        extension = os.path.splitext(
+            file.filename
+        )[1].lower()
+
+        allowed = [
+
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".jfif",
+            ".bmp",
+            ".webp"
+
+        ]
+
+        if extension not in allowed:
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    "Định dạng ảnh không được hỗ trợ."
+
+            }), 400
+
+        # -------------------------------------------------
+        # UPLOAD
+        # -------------------------------------------------
+
+        upload_folder = "uploads"
+
+        os.makedirs(
+            upload_folder,
+            exist_ok=True
+        )
+
+        filename = (
+            uuid.uuid4().hex
+            + extension
+        )
+
+        image_path = os.path.join(
+            upload_folder,
+            filename
+        )
+
+        file.save(
+            image_path
+        )
+
+        # -------------------------------------------------
+        # CONFIDENCE
+        # -------------------------------------------------
+
+        confidence = request.form.get(
+            "confidence",
+            "0.5"
+        )
+
         try:
-            # Generate unique filename
-            filename = generate_unique_filename(secure_filename(file.filename))
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            
-            # Save uploaded file
-            file.save(filepath)
-            
-            # Run inference
-            result = detector.predict(filepath)
-            
-            # Copy original image to static folder for display
-            original_static_path = os.path.join(app.config['STATIC_FOLDER'], filename)
-            with open(filepath, 'rb') as f:
-                with open(original_static_path, 'wb') as f2:
-                    f2.write(f.read())
-            
-            # Add the original image path to the response
-            result['original_image'] = f'/static/{filename}'
-            result['annotated_image'] = f'/static/{result["annotated_image"]}'
-            
-            # Clean up uploaded file
-            os.remove(filepath)
-            
-            return jsonify(result)
-            
-        except Exception as e:
-            # Clean up on error
-            if os.path.exists(filepath):
-                os.remove(filepath)
-            return jsonify({'error': str(e)}), 500
-    
-    return jsonify({'error': 'Invalid file type'}), 400
 
-if __name__ == '__main__':
-    print(f"Current working directory: {os.getcwd()}")
-    print(f"Model folder exists: {os.path.exists(MODEL_FOLDER)}")
-    print(f"Templates folder exists: {os.path.exists(TEMPLATES_FOLDER)}")
-    app.run(debug=True, host='0.0.0.0', port=5000) 
+            confidence = float(
+                confidence
+            )
+
+        except ValueError:
+
+            confidence = 0.5
+
+        confidence = max(
+            0.1,
+            min(
+                confidence,
+                0.95
+            )
+        )
+
+        # -------------------------------------------------
+        # PREPROCESSING
+        # -------------------------------------------------
+
+        preprocessing_value = (
+            request.form.get(
+                "preprocessing",
+                "true"
+            )
+        )
+
+        apply_preprocessing = (
+            preprocessing_value.lower()
+            == "true"
+        )
+
+        # -------------------------------------------------
+        # RUN PIPELINE
+        # -------------------------------------------------
+
+        result = pipeline.run(
+
+            image_path,
+
+            conf_thresh=confidence,
+
+            apply_preprocessing=
+                apply_preprocessing
+
+        )
+
+        # -------------------------------------------------
+        # PIPELINE ERROR
+        # -------------------------------------------------
+
+        if result.get("error"):
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                    result["error"]
+
+            }), 500
+
+        # -------------------------------------------------
+        # RESPONSE
+        # -------------------------------------------------
+
+        return jsonify({
+
+            "success": True,
+
+            "message":
+                result.get(
+                    "message",
+                    ""
+                ),
+
+            "has_violations":
+                result.get(
+                    "has_violations",
+                    False
+                ),
+
+            "total_detections":
+                result.get(
+                    "total_detections",
+                    0
+                ),
+
+            "violations":
+                result.get(
+                    "violations",
+                    []
+                ),
+
+            "statistics":
+                result.get(
+                    "statistics",
+                    {
+
+                        "total": 0,
+
+                        "safe": 0,
+
+                        "unsafe": 0
+
+                    }
+                ),
+
+            "summary_report":
+                result.get(
+                    "summary_report",
+                    {}
+                ),
+
+            "processing":
+                result.get(
+                    "processing",
+                    {}
+                ),
+
+            "confidence_threshold_used":
+                result.get(
+                    "confidence_threshold_used",
+                    confidence
+                ),
+
+            "original_image":
+                result.get(
+                    "original_image"
+                ),
+
+            "preprocessed_image":
+                result.get(
+                    "preprocessed_image"
+                ),
+
+            "annotated_image":
+                result.get(
+                    "annotated_image"
+                )
+
+        })
+
+    except Exception as e:
+
+        import traceback
+
+        traceback.print_exc()
+
+        return jsonify({
+
+            "success": False,
+
+            "error": str(e)
+
+        }), 500
+
+
+# =========================================================
+# RUN
+# =========================================================
+
+if __name__ == "__main__":
+
+    app.run(
+
+        debug=True,
+
+        host="0.0.0.0",
+
+        port=5000
+
+    )

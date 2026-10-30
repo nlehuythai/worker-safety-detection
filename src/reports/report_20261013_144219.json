@@ -1,0 +1,56 @@
+{
+    "report_id": "REP_20261013_144219",
+    "timestamp": "2026-10-13 14:42:19",
+    "source_image": "106244dbc44e41d1ab6ccee6bad11ad7.jpg",
+    "summary": {
+        "total_violations": 3,
+        "violation_breakdown": {
+            "No Safety Glasses": 3
+        }
+    },
+    "confidence_threshold": 0.1,
+    "details": [
+        {
+            "class": "no-safety-glasses",
+            "label": {
+                "en": "No Safety Glasses"
+            },
+            "emoji": "👓",
+            "confidence": 0.584,
+            "bbox": {
+                "x1": 156.96,
+                "y1": 275.77,
+                "x2": 206.89,
+                "y2": 296.3
+            }
+        },
+        {
+            "class": "no-safety-glasses",
+            "label": {
+                "en": "No Safety Glasses"
+            },
+            "emoji": "👓",
+            "confidence": 0.49,
+            "bbox": {
+                "x1": 340.05,
+                "y1": 325.38,
+                "x2": 391.8,
+                "y2": 346.56
+            }
+        },
+        {
+            "class": "no-safety-glasses",
+            "label": {
+                "en": "No Safety Glasses"
+            },
+            "emoji": "👓",
+            "confidence": 0.391,
+            "bbox": {
+                "x1": 471.48,
+                "y1": 340.5,
+                "x2": 513.69,
+                "y2": 359.25
+            }
+        }
+    ]
+}

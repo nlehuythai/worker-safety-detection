@@ -1,170 +1,1790 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construction Site Safety Detection System</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+    <title>SafetyGuard AI</title>
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        .upload-section {
-            border: 2px dashed #3498db;
-            padding: 30px;
-            text-align: center;
-            border-radius: 8px;
-            background: #ebf5fb;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        .upload-section input[type="file"] {
-            display: none;
-        }
-
-        .btn-submit {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-
-        .btn-submit:hover {
-            background-color: #27ae60;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-            font-weight: bold;
-            color: #e67e22;
-        }
-
-        .result-container {
-            display: none;
-            margin-top: 30px;
-        }
-
-        .image-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .image-card {
-            text-align: center;
-        }
-
-        .image-card img {
-            max-width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </head>
 
-<body>
 
-    <div class="container">
-        <h1>👷‍♂️ Worker Safety Detection System</h1>
-        <p style="text-align: center; color: #666;">Upload construction site images for AI analysis and safety violation
-            detection</p>
+<body class="bg-slate-950 text-white min-h-screen">
 
-        <form id="uploadForm">
-            <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-                <p id="fileNameDisplay">📁 Click here to select an image (.jpg, .png)</p>
-                <input type="file" id="fileInput" name="image" accept="image/*" required onchange="showFileName(this)">
-            </div>
-            <button type="submit" class="btn-submit">🚀 Run Analysis</button>
-        </form>
+    <header class="bg-slate-900 border-b border-slate-700">
 
-        <div class="loading" id="loadingText">⏳ Processing image via OpenCV & YOLOv8 algorithms... Please wait!</div>
+        <div class="max-w-7xl mx-auto px-6 py-4">
 
-        <div class="result-container" id="resultContainer">
-            <h2>📊 Detection Results</h2>
-            <div class="image-grid">
-                <div class="image-card">
-                    <h3>📷 Original Image</h3>
-                    <img id="originalImg" src="" alt="Original Image">
+            <div class="flex items-center gap-3">
+
+                <div class="bg-amber-500 text-slate-950
+                        w-11 h-11 rounded-xl
+                        flex items-center justify-center">
+
+                    <i class="fa-solid fa-hard-hat text-xl"></i>
+
                 </div>
-                <div class="image-card">
-                    <h3>🤖 Detected Violations</h3>
-                    <img id="annotatedImg" src="" alt="Annotated Image">
+
+                <div>
+
+                    <h1 class="text-xl font-bold">
+                        SafetyGuard AI
+                    </h1>
+
+                    <p class="text-xs text-slate-400">
+                        Hệ thống phân tích an toàn lao động
+                        bằng Xử lý ảnh & YOLO
+                    </p>
+
                 </div>
+
             </div>
+
         </div>
-    </div>
 
-    <script>
-        function showFileName(input) {
-            if (input.files && input.files[0]) {
-                document.getElementById('fileNameDisplay').innerText = "📄 Selected: " + input.files[0].name;
-            }
+    </header>
+
+
+    <main class="max-w-7xl mx-auto px-5 py-6">
+
+
+        <!-- =====================================================
+     KPI
+===================================================== -->
+
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
+
+
+            <div class="bg-slate-900 border border-slate-700
+                rounded-xl p-4">
+
+                <p class="text-xs text-slate-400">
+                    Trạng thái
+                </p>
+
+                <p id="kpi-status" class="text-lg font-bold text-slate-300 mt-2">
+                    Chờ phân tích
+                </p>
+
+            </div>
+
+
+            <div class="bg-slate-900 border border-slate-700
+                rounded-xl p-4">
+
+                <p class="text-xs text-slate-400">
+                    Tổng phát hiện
+                </p>
+
+                <p id="kpi-total" class="text-2xl font-bold text-blue-400 mt-2">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="bg-slate-900 border border-slate-700
+                rounded-xl p-4">
+
+                <p class="text-xs text-slate-400">
+                    An toàn
+                </p>
+
+                <p id="kpi-safe" class="text-2xl font-bold text-emerald-400 mt-2">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="bg-slate-900 border border-slate-700
+                rounded-xl p-4">
+
+                <p class="text-xs text-slate-400">
+                    Vi phạm
+                </p>
+
+                <p id="kpi-unsafe" class="text-2xl font-bold text-red-400 mt-2">
+                    0
+                </p>
+
+            </div>
+
+
+            <div class="bg-slate-900 border border-slate-700
+                rounded-xl p-4">
+
+                <p class="text-xs text-slate-400">
+                    Processing
+                </p>
+
+                <p id="kpi-time" class="text-lg font-bold text-amber-400 mt-2">
+                    -- s
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="grid lg:grid-cols-12 gap-5">
+
+
+            <!-- =====================================================
+     LEFT
+===================================================== -->
+
+            <div class="lg:col-span-7 space-y-5">
+
+
+                <!-- UPLOAD -->
+
+                <section class="bg-slate-900 border border-slate-700
+           rounded-xl p-5">
+
+                    <div class="flex justify-between items-center mb-4">
+
+                        <div>
+
+                            <h2 class="font-semibold">
+
+                                <i class="fa-solid fa-upload text-amber-400 mr-2"></i>
+
+                                Tải ảnh kiểm tra
+
+                            </h2>
+
+                            <p class="text-xs text-slate-500 mt-1">
+                                Ảnh công trường / người lao động
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <form id="upload-form">
+
+
+                        <div id="drop-zone" class="border-2 border-dashed
+                   border-slate-600 rounded-xl
+                   p-8 text-center
+                   cursor-pointer
+                   hover:border-amber-500
+                   transition">
+
+                            <input type="file" id="image-input" accept="image/*" class="hidden">
+
+                            <i class="fa-solid fa-cloud-arrow-up
+                       text-4xl text-slate-500"></i>
+
+                            <p class="mt-3 font-medium">
+
+                                Kéo thả ảnh vào đây
+
+                            </p>
+
+                            <p class="text-sm text-slate-400">
+
+                                hoặc
+                                <span class="text-amber-400">
+                                    chọn ảnh từ máy tính
+                                </span>
+
+                            </p>
+
+                            <p id="file-name" class="text-xs text-blue-400 mt-3"></p>
+
+                        </div>
+
+
+                        <!-- CONTROLS -->
+
+                        <div class="grid grid-cols-2 gap-3 mt-4">
+
+
+                            <div class="bg-slate-950
+                       border border-slate-700
+                       rounded-lg p-3">
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-xs text-slate-400">
+                                        Confidence Threshold
+                                    </span>
+
+                                    <span id="confidence-value" class="text-xs text-amber-400">
+                                        0.50
+                                    </span>
+
+                                </div>
+
+
+                                <input id="confidence" type="range" min="0.1" max="0.95" step="0.05" value="0.5"
+                                    class="w-full mt-3">
+
+                            </div>
+
+
+                            <div class="bg-slate-950
+                       border border-slate-700
+                       rounded-lg p-3">
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-xs text-slate-400">
+                                        Image Preprocessing
+                                    </span>
+
+                                    <span id="preprocess-status" class="text-xs text-emerald-400">
+                                        ON
+                                    </span>
+
+                                </div>
+
+
+                                <label class="flex items-center
+                           justify-between mt-3">
+
+                                    <span class="text-xs text-slate-300">
+                                        LAB + CLAHE + Gaussian
+                                    </span>
+
+                                    <input id="preprocessing" type="checkbox" checked class="w-5 h-5 accent-amber-500">
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="submit" id="btn-analyze" class="w-full bg-amber-500
+                   hover:bg-amber-600
+                   text-slate-950
+                   font-bold
+                   py-3 rounded-lg
+                   mt-4">
+
+                            <i class="fa-solid fa-magnifying-glass mr-2"></i>
+
+                            BẮT ĐẦU PHÂN TÍCH
+
+                        </button>
+
+                    </form>
+
+                </section>
+
+
+
+                <!-- RESULT -->
+
+                <section class="bg-slate-900
+           border border-slate-700
+           rounded-xl p-5">
+
+                    <div class="flex justify-between items-center mb-3">
+
+                        <h2 class="font-semibold">
+
+                            <i class="fa-solid fa-bullseye
+                      text-rose-400 mr-2"></i>
+
+                            Kết quả phát hiện
+
+                        </h2>
+
+
+                        <span id="result-status" class="text-xs text-slate-500">
+                            Chưa phân tích
+                        </span>
+
+                    </div>
+
+
+                    <div class="relative bg-slate-950
+               rounded-lg border border-slate-700
+               min-h-[350px]
+               flex items-center justify-center">
+
+                        <div id="loading" class="hidden absolute inset-0
+                   bg-slate-950/90 z-20
+                   flex flex-col
+                   items-center justify-center">
+
+                            <div class="w-10 h-10
+                       border-4
+                       border-amber-500
+                       border-t-transparent
+                       rounded-full
+                       animate-spin"></div>
+
+                            <p class="mt-3 text-sm text-slate-300">
+                                Đang xử lý ảnh...
+                            </p>
+
+                        </div>
+
+
+                        <img id="result-image" class="hidden max-h-[520px]
+                   max-w-full object-contain">
+
+
+                        <p id="result-placeholder" class="text-slate-600 text-sm">
+                            Kết quả YOLO sẽ xuất hiện tại đây
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+            </div>
+
+
+
+            <!-- =====================================================
+     RIGHT
+===================================================== -->
+
+            <div class="lg:col-span-5 space-y-5">
+
+
+                <!-- PROCESSING PIPELINE -->
+
+                <section class="bg-slate-900
+           border border-slate-700
+           rounded-xl p-5">
+
+                    <h2 class="font-semibold mb-4">
+
+                        <i class="fa-solid fa-diagram-project
+                  text-purple-400 mr-2"></i>
+
+                        Image Processing Pipeline
+
+                    </h2>
+
+
+                    <div class="space-y-3">
+
+
+                        <div class="pipeline-step">
+
+                            <span>📷</span>
+
+                            <div>
+
+                                <b>Input Image</b>
+
+                                <p>Ảnh đầu vào</p>
+
+                            </div>
+
+                            <strong id="time-input">✓</strong>
+
+                        </div>
+
+
+                        <div class="pipeline-arrow">↓</div>
+
+
+                        <div class="pipeline-step">
+
+                            <span>🔵</span>
+
+                            <div>
+
+                                <b>Color Space</b>
+
+                                <p>RGB → LAB</p>
+
+                            </div>
+
+                            <strong id="time-color">--</strong>
+
+                        </div>
+
+
+                        <div class="pipeline-arrow">↓</div>
+
+
+                        <div class="pipeline-step">
+
+                            <span>🟣</span>
+
+                            <div>
+
+                                <b>CLAHE</b>
+
+                                <p>Contrast Enhancement</p>
+
+                            </div>
+
+                            <strong id="time-clahe">--</strong>
+
+                        </div>
+
+
+                        <div class="pipeline-arrow">↓</div>
+
+
+                        <div class="pipeline-step">
+
+                            <span>🟢</span>
+
+                            <div>
+
+                                <b>Noise Filtering</b>
+
+                                <p>Gaussian Blur</p>
+
+                            </div>
+
+                            <strong id="time-noise">--</strong>
+
+                        </div>
+
+
+                        <div class="pipeline-arrow">↓</div>
+
+
+                        <div class="pipeline-step">
+
+                            <span>🟡</span>
+
+                            <div>
+
+                                <b>YOLO Inference</b>
+
+                                <p>Object Detection</p>
+
+                            </div>
+
+                            <strong id="time-yolo">--</strong>
+
+                        </div>
+
+
+                        <div class="pipeline-arrow">↓</div>
+
+
+                        <div class="pipeline-step">
+
+                            <span>🔴</span>
+
+                            <div>
+
+                                <b>Post-processing</b>
+
+                                <p>Bounding Box & Statistics</p>
+
+                            </div>
+
+                            <strong id="time-post">--</strong>
+
+                        </div>
+
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- REPORT -->
+
+                <section class="bg-slate-900
+           border border-slate-700
+           rounded-xl p-5">
+
+                    <div class="flex justify-between mb-4">
+
+                        <h2 class="font-semibold">
+
+                            <i class="fa-solid fa-chart-pie
+                      text-amber-400 mr-2"></i>
+
+                            Phân tích vi phạm
+
+                        </h2>
+
+                        <span id="report-time" class="text-xs text-slate-500">
+                            --:--:--
+                        </span>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full text-xs">
+
+                            <thead>
+
+                                <tr class="text-slate-400
+                           border-b border-slate-700">
+
+                                    <th class="text-left p-2">
+                                        Loại vi phạm
+                                    </th>
+
+                                    <th class="text-center p-2">
+                                        SL
+                                    </th>
+
+                                    <th class="text-right p-2">
+                                        Confidence
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="report-table">
+
+                                <tr>
+
+                                    <td colspan="3" class="text-center
+                               text-slate-600
+                               p-5">
+
+                                        Chưa có dữ liệu
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+
+                        <button id="btn-json" disabled class="bg-slate-800
+                   disabled:opacity-40
+                   rounded-lg py-2 text-xs">
+
+                            <i class="fa-solid fa-file-code mr-1"></i>
+
+                            Xuất JSON
+
+                        </button>
+
+
+                        <button id="btn-print" disabled class="bg-slate-800
+                   disabled:opacity-40
+                   rounded-lg py-2 text-xs">
+
+                            <i class="fa-solid fa-print mr-1"></i>
+
+                            In báo cáo
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+     IMAGE PROCESSING COMPARISON
+===================================================== -->
+
+        <section class="bg-slate-900
+           border border-slate-700
+           rounded-xl p-5 mt-5">
+
+            <div class="flex justify-between">
+
+                <div>
+
+                    <h2 class="font-semibold">
+
+                        <i class="fa-solid fa-wand-magic-sparkles
+                          text-purple-400 mr-2"></i>
+
+                        Phân tích xử lý ảnh
+
+                    </h2>
+
+                    <p class="text-xs text-slate-500 mt-1">
+
+                        So sánh ảnh đầu vào,
+                        ảnh sau tiền xử lý và kết quả AI
+
+                    </p>
+
+                </div>
+
+                <span id="processing-badge" class="text-xs text-slate-500">
+                    PROCESSING OUTPUT
+                </span>
+
+            </div>
+
+
+            <div class="grid md:grid-cols-3 gap-4 mt-5">
+
+
+                <!-- ORIGINAL -->
+
+                <div>
+
+                    <div class="flex justify-between
+                       text-xs mb-2">
+
+                        <span>
+                            01. ẢNH GỐC
+                        </span>
+
+                        <span class="text-blue-400">
+                            INPUT
+                        </span>
+
+                    </div>
+
+
+                    <div class="image-box">
+
+                        <img id="original-image" class="hidden">
+
+                        <span id="original-placeholder">
+                            Chưa có ảnh
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PREPROCESSED -->
+
+                <div>
+
+                    <div class="flex justify-between
+                       text-xs mb-2">
+
+                        <span>
+                            02. SAU TIỀN XỬ LÝ
+                        </span>
+
+                        <span class="text-purple-400">
+                            LAB + CLAHE
+                        </span>
+
+                    </div>
+
+
+                    <div class="image-box">
+
+                        <img id="preprocessed-image" class="hidden">
+
+                        <span id="preprocessed-placeholder">
+                            Chưa xử lý
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AI RESULT -->
+
+                <div>
+
+                    <div class="flex justify-between
+                       text-xs mb-2">
+
+                        <span>
+                            03. KẾT QUẢ AI
+                        </span>
+
+                        <span class="text-amber-400">
+                            YOLO
+                        </span>
+
+                    </div>
+
+
+                    <div class="image-box">
+
+                        <img id="ai-image" class="hidden">
+
+                        <span id="ai-placeholder">
+                            Chưa phân tích
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROCESSING METRICS -->
+
+            <div class="grid grid-cols-2
+               md:grid-cols-5 gap-3 mt-5">
+
+
+                <div class="metric-card">
+
+                    <p>COLOR SPACE</p>
+
+                    <strong id="metric-color">
+                        -- ms
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <p>CLAHE</p>
+
+                    <strong id="metric-clahe">
+                        -- ms
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <p>FILTER</p>
+
+                    <strong id="metric-filter">
+                        -- ms
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <p>YOLO</p>
+
+                    <strong id="metric-yolo">
+                        -- ms
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <p>TOTAL</p>
+
+                    <strong id="metric-total" class="text-amber-400">
+                        -- ms
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <style>
+        .pipeline-step {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 12px;
+
+            border: 1px solid #334155;
+
+            border-radius: 9px;
+
+            background: #0f172a;
+
         }
 
-        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
+        .pipeline-step div {
 
-            const fileInput = document.getElementById('fileInput');
-            if (!fileInput.files[0]) return;
+            flex: 1;
 
-            const formData = new FormData();
-            formData.append('image', fileInput.files[0]);
+        }
 
-            document.getElementById('loadingText').style.display = 'block';
-            document.getElementById('resultContainer').style.display = 'none';
+        .pipeline-step b {
 
-            try {
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    body: formData
-                });
+            font-size: 12px;
 
-                const result = await response.json();
+        }
 
-                if (response.ok) {
-                    document.getElementById('originalImg').src = result.original_image;
-                    document.getElementById('annotatedImg').src = result.annotated_image;
-                    document.getElementById('resultContainer').style.display = 'block';
-                } else {
-                    alert('Error: ' + (result.error || 'Failed to process image'));
-                }
-            } catch (error) {
-                alert('An error occurred while connecting to the Flask Server!');
-                console.error(error);
-            } finally {
-                document.getElementById('loadingText').style.display = 'none';
+        .pipeline-step p {
+
+            font-size: 9px;
+
+            color: #64748b;
+
+            margin-top: 2px;
+
+        }
+
+        .pipeline-step strong {
+
+            font-size: 10px;
+
+            color: #34d399;
+
+        }
+
+        .pipeline-arrow {
+
+            text-align: center;
+
+            color: #475569;
+
+            font-size: 12px;
+
+        }
+
+        .image-box {
+
+            height: 230px;
+
+            border: 1px solid #334155;
+
+            border-radius: 8px;
+
+            background: #020617;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            color: #475569;
+
+            font-size: 11px;
+
+        }
+
+        .image-box img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+        }
+
+        .metric-card {
+
+            background: #0f172a;
+
+            border: 1px solid #334155;
+
+            border-radius: 8px;
+
+            padding: 10px;
+
+        }
+
+        .metric-card p {
+
+            color: #64748b;
+
+            font-size: 9px;
+
+        }
+
+        .metric-card strong {
+
+            font-size: 12px;
+
+            color: #cbd5e1;
+
+        }
+    </style>
+
+
+
+    <script>
+
+        const imageInput =
+            document.getElementById(
+                "image-input"
+            );
+
+        const dropZone =
+            document.getElementById(
+                "drop-zone"
+            );
+
+        const uploadForm =
+            document.getElementById(
+                "upload-form"
+            );
+
+        const loading =
+            document.getElementById(
+                "loading"
+            );
+
+
+        let lastReport = null;
+
+
+        /* =====================================================
+           FILE SELECT
+        ===================================================== */
+
+        dropZone.addEventListener(
+            "click",
+            () => imageInput.click()
+        );
+
+
+        imageInput.addEventListener(
+            "change",
+            () => {
+
+                const file =
+                    imageInput.files[0];
+
+                if (!file) return;
+
+                document.getElementById(
+                    "file-name"
+                ).innerText =
+                    file.name;
+
             }
-        });
+        );
+
+
+        /* =====================================================
+           CONFIDENCE
+        ===================================================== */
+
+        const confidence =
+            document.getElementById(
+                "confidence"
+            );
+
+
+        confidence.addEventListener(
+            "input",
+            () => {
+
+                document.getElementById(
+                    "confidence-value"
+                ).innerText =
+                    Number(
+                        confidence.value
+                    ).toFixed(2);
+
+            }
+        );
+
+
+        /* =====================================================
+           PREPROCESSING
+        ===================================================== */
+
+        document.getElementById(
+            "preprocessing"
+        ).addEventListener(
+            "change",
+            function () {
+
+                document.getElementById(
+                    "preprocess-status"
+                ).innerText =
+                    this.checked
+                        ? "ON"
+                        : "OFF";
+
+            }
+        );
+
+
+        /* =====================================================
+           ANALYZE
+        ===================================================== */
+
+        uploadForm.addEventListener(
+            "submit",
+            async function (e) {
+
+                e.preventDefault();
+
+
+                const file =
+                    imageInput.files[0];
+
+
+                if (!file) {
+
+                    alert(
+                        "Vui lòng chọn ảnh."
+                    );
+
+                    return;
+
+                }
+
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "file",
+                    file
+                );
+
+
+                formData.append(
+                    "confidence",
+                    confidence.value
+                );
+
+
+                formData.append(
+                    "preprocessing",
+                    document.getElementById(
+                        "preprocessing"
+                    ).checked
+                        ? "true"
+                        : "false"
+                );
+
+
+                loading.classList.remove(
+                    "hidden"
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/analyze",
+                            {
+
+                                method: "POST",
+
+                                body: formData
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.error ||
+                            "Phân tích thất bại."
+                        );
+
+                    }
+
+
+                    renderDashboard(
+                        data
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "Lỗi: "
+                        + error.message
+                    );
+
+                } finally {
+
+                    loading.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           RENDER
+        ===================================================== */
+
+        function renderDashboard(data) {
+
+
+            /* -----------------------------------------------
+               IMAGE URL CACHE BUST
+            ------------------------------------------------ */
+
+            const timestamp =
+                Date.now();
+
+
+            const originalUrl =
+                data.original_image
+                    ? data.original_image
+                    + "?t="
+                    + timestamp
+                    : null;
+
+
+            const preprocessedUrl =
+                data.preprocessed_image
+                    ? data.preprocessed_image
+                    + "?t="
+                    + timestamp
+                    : null;
+
+
+            const resultUrl =
+                data.annotated_image
+                    ? data.annotated_image
+                    + "?t="
+                    + timestamp
+                    : null;
+
+
+            /* -----------------------------------------------
+               ORIGINAL
+            ------------------------------------------------ */
+
+            if (originalUrl) {
+
+                const img =
+                    document.getElementById(
+                        "original-image"
+                    );
+
+                img.src =
+                    originalUrl;
+
+                img.classList.remove(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "original-placeholder"
+                ).classList.add(
+                    "hidden"
+                );
+
+            }
+
+
+            /* -----------------------------------------------
+               PREPROCESSED
+            ------------------------------------------------ */
+
+            if (preprocessedUrl) {
+
+                const img =
+                    document.getElementById(
+                        "preprocessed-image"
+                    );
+
+                img.src =
+                    preprocessedUrl;
+
+                img.classList.remove(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "preprocessed-placeholder"
+                ).classList.add(
+                    "hidden"
+                );
+
+            }
+
+
+            /* -----------------------------------------------
+               AI RESULT
+            ------------------------------------------------ */
+
+            if (resultUrl) {
+
+                const img =
+                    document.getElementById(
+                        "ai-image"
+                    );
+
+                img.src =
+                    resultUrl;
+
+                img.classList.remove(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "ai-placeholder"
+                ).classList.add(
+                    "hidden"
+                );
+
+
+                const mainResult =
+                    document.getElementById(
+                        "result-image"
+                    );
+
+                mainResult.src =
+                    resultUrl;
+
+                mainResult.classList.remove(
+                    "hidden"
+                );
+
+                document.getElementById(
+                    "result-placeholder"
+                ).classList.add(
+                    "hidden"
+                );
+
+            }
+
+
+            /* -----------------------------------------------
+               STATISTICS
+            ------------------------------------------------ */
+
+            const stats =
+                data.statistics || {};
+
+
+            document.getElementById(
+                "kpi-total"
+            ).innerText =
+                stats.total || 0;
+
+
+            document.getElementById(
+                "kpi-safe"
+            ).innerText =
+                stats.safe || 0;
+
+
+            document.getElementById(
+                "kpi-unsafe"
+            ).innerText =
+                stats.unsafe || 0;
+
+
+            /* -----------------------------------------------
+               STATUS
+            ------------------------------------------------ */
+
+            const violationCount =
+                stats.unsafe || 0;
+
+
+            if (violationCount > 0) {
+
+                document.getElementById(
+                    "kpi-status"
+                ).innerText =
+                    "Phát hiện lỗi";
+
+                document.getElementById(
+                    "kpi-status"
+                ).className =
+                    "text-lg font-bold text-red-400 mt-2";
+
+                document.getElementById(
+                    "result-status"
+                ).innerText =
+                    "VIOLATIONS DETECTED";
+
+                document.getElementById(
+                    "result-status"
+                ).className =
+                    "text-xs text-red-400";
+
+            } else {
+
+                document.getElementById(
+                    "kpi-status"
+                ).innerText =
+                    "An toàn";
+
+                document.getElementById(
+                    "kpi-status"
+                ).className =
+                    "text-lg font-bold text-emerald-400 mt-2";
+
+                document.getElementById(
+                    "result-status"
+                ).innerText =
+                    "SAFE";
+
+                document.getElementById(
+                    "result-status"
+                ).className =
+                    "text-xs text-emerald-400";
+
+            }
+
+
+            /* -----------------------------------------------
+               PROCESSING
+            ------------------------------------------------ */
+
+            const p =
+                data.processing || {};
+
+
+            setTime(
+                "time-color",
+                p.color_space
+            );
+
+            setTime(
+                "time-clahe",
+                p.clahe
+            );
+
+            setTime(
+                "time-noise",
+                p.noise_filter
+            );
+
+            setTime(
+                "time-yolo",
+                p.yolo
+            );
+
+            setTime(
+                "time-post",
+                p.post_processing
+            );
+
+
+            document.getElementById(
+                "kpi-time"
+            ).innerText =
+                formatTime(
+                    p.total
+                );
+
+
+            /* -----------------------------------------------
+               METRICS
+            ------------------------------------------------ */
+
+            document.getElementById(
+                "metric-color"
+            ).innerText =
+                formatMs(
+                    p.color_space
+                );
+
+
+            document.getElementById(
+                "metric-clahe"
+            ).innerText =
+                formatMs(
+                    p.clahe
+                );
+
+
+            document.getElementById(
+                "metric-filter"
+            ).innerText =
+                formatMs(
+                    p.noise_filter
+                );
+
+
+            document.getElementById(
+                "metric-yolo"
+            ).innerText =
+                formatMs(
+                    p.yolo
+                );
+
+
+            document.getElementById(
+                "metric-total"
+            ).innerText =
+                formatMs(
+                    p.total
+                );
+
+
+            /* -----------------------------------------------
+               REPORT TABLE
+            ------------------------------------------------ */
+
+            const table =
+                document.getElementById(
+                    "report-table"
+                );
+
+
+            table.innerHTML = "";
+
+
+            const violations =
+                data.violations || [];
+
+
+            if (
+                violations.length === 0
+            ) {
+
+                table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="3"
+                    class="text-center
+                           text-emerald-400
+                           p-5"
+                >
+
+                    <i class="fa-solid
+                              fa-circle-check mr-1"></i>
+
+                    Không phát hiện vi phạm
+
+                </td>
+
+            </tr>
+
+        `;
+
+            } else {
+
+
+                const groups = {};
+
+
+                violations.forEach(
+                    item => {
+
+                        const name =
+                            item.label?.en
+                            || item.class
+                            || "Unknown";
+
+
+                        if (!groups[name]) {
+
+                            groups[name] = {
+
+                                count: 0,
+
+                                confidence: 0
+
+                            };
+
+                        }
+
+
+                        groups[name].count++;
+
+                        groups[name].confidence +=
+                            Number(
+                                item.confidence
+                            );
+
+                    }
+                );
+
+
+                Object.entries(
+                    groups
+                ).forEach(
+                    ([name, info]) => {
+
+                        const avg =
+                            (
+                                info.confidence
+                                / info.count
+                            ) * 100;
+
+
+                        const row =
+                            document.createElement(
+                                "tr"
+                            );
+
+
+                        row.className =
+                            "border-b border-slate-800";
+
+
+                        row.innerHTML = `
+
+                    <td class="p-2">
+
+                        <span
+                            class="text-red-400 mr-2"
+                        >
+                            ⚠
+                        </span>
+
+                        ${name}
+
+                    </td>
+
+
+                    <td
+                        class="text-center
+                               text-amber-400
+                               font-bold"
+                    >
+
+                        ${info.count}
+
+                    </td>
+
+
+                    <td
+                        class="text-right
+                               text-slate-300"
+                    >
+
+                        ${avg.toFixed(1)}%
+
+                    </td>
+
+                `;
+
+
+                        table.appendChild(
+                            row
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* -----------------------------------------------
+               REPORT
+            ------------------------------------------------ */
+
+            lastReport =
+                data.summary_report || data;
+
+
+            document.getElementById(
+                "report-time"
+            ).innerText =
+                new Date().toLocaleTimeString(
+                    "vi-VN"
+                );
+
+
+            document.getElementById(
+                "btn-json"
+            ).disabled = false;
+
+
+            document.getElementById(
+                "btn-print"
+            ).disabled = false;
+
+        }
+
+
+        /* =====================================================
+           HELPERS
+        ===================================================== */
+
+        function formatMs(seconds) {
+
+            if (
+                seconds === undefined ||
+                seconds === null
+            ) {
+
+                return "-- ms";
+
+            }
+
+
+            return (
+                seconds * 1000
+            ).toFixed(1)
+                + " ms";
+
+        }
+
+
+        function formatTime(seconds) {
+
+            if (
+                seconds === undefined ||
+                seconds === null
+            ) {
+
+                return "-- s";
+
+            }
+
+
+            return (
+                seconds
+            ).toFixed(3)
+                + " s";
+
+        }
+
+
+        function setTime(
+            id,
+            value
+        ) {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (
+                value === undefined ||
+                value === null
+            ) {
+
+                element.innerText =
+                    "--";
+
+                return;
+
+            }
+
+
+            element.innerText =
+                formatMs(
+                    value
+                );
+
+        }
+
+
+        /* =====================================================
+           EXPORT JSON
+        ===================================================== */
+
+        document.getElementById(
+            "btn-json"
+        ).addEventListener(
+            "click",
+            () => {
+
+                if (!lastReport) return;
+
+
+                const blob =
+                    new Blob(
+                        [
+                            JSON.stringify(
+                                lastReport,
+                                null,
+                                4
+                            )
+                        ],
+                        {
+                            type:
+                                "application/json"
+                        }
+                    );
+
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                const a =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                a.href =
+                    url;
+
+                a.download =
+                    "safetyguard_report.json";
+
+
+                a.click();
+
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           PRINT
+        ===================================================== */
+
+        document.getElementById(
+            "btn-print"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.print();
+
+            }
+        );
+
     </script>
+
 
 </body>
 
